@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 
+enum OrderOptions {orderaz, orderza}
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -28,6 +30,21 @@ class _HomePageState extends State<HomePage> {
         title: Text("Contatcs"),
         backgroundColor: Colors.red,
         centerTitle: true,
+        actions: <Widget>[
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Sort A-Z"),
+                value: OrderOptions.orderaz,
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Sort Z-A"),
+                value: OrderOptions.orderza,
+              ),
+            ],
+            onSelected: _orderList,
+          )
+        ],
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -62,7 +79,9 @@ class _HomePageState extends State<HomePage> {
                   image: DecorationImage(
                       image: contacts[index].img != null
                           ? FileImage(File(contacts[index].img))
-                          : AssetImage("images/person.png")),
+                          : AssetImage("images/person.png"),
+                      fit: BoxFit.cover,
+                  ),
                 ),
               ),
               Padding(
@@ -100,6 +119,22 @@ class _HomePageState extends State<HomePage> {
         _showOptions(context, index);
       },
     );
+  }
+
+  void _orderList(OrderOptions result) {
+    switch(result) {
+      case OrderOptions.orderaz:
+        contacts.sort((a, b) {
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case OrderOptions.orderza:
+        contacts.sort((a, b) {
+          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+        });
+        break;
+    }
+    setState(() {});
   }
 
   void _showOptions(BuildContext context, int index) {
